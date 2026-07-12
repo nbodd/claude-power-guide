@@ -877,6 +877,7 @@ kbd {
   <a class="nav-item" onclick="nav('hooks')"><span class="ni">08</span>Hooks</a>
   <a class="nav-item" onclick="nav('mcp')"><span class="ni">09</span>MCP Servers</a>
   <a class="nav-item" onclick="nav('subagents')"><span class="ni">10</span>Subagents</a>
+  <a class="nav-item" onclick="nav('orchestration')"><span class="ni">10b</span>Workflows &amp; Teams <span style="color:var(--g);font-size:0.5rem;margin-left:2px;">NEW</span></a>
   <a class="nav-item" onclick="nav('skills')"><span class="ni">11</span>Skills &amp; Commands</a>
   <a class="nav-item" onclick="nav('models')"><span class="ni">12</span>Model Strategy</a>
 
@@ -901,6 +902,7 @@ kbd {
   <button class="bn-btn" onclick="nav('hooks')">Hooks</button>
   <button class="bn-btn" onclick="nav('mcp')">MCP</button>
   <button class="bn-btn" onclick="nav('subagents')">Agents</button>
+  <button class="bn-btn" onclick="nav('orchestration')">Workflows</button>
   <button class="bn-btn" onclick="nav('skills')">Skills</button>
   <button class="bn-btn" onclick="nav('models')">Models</button>
   <button class="bn-btn" onclick="nav('memory')">Memory</button>
@@ -917,7 +919,7 @@ kbd {
 <nav class="sidebar">
   <div class="sb-top">
     <div class="sb-logo">$ claude --obsessive<span class="cursor"></span></div>
-    <div class="sb-ver">v2.1.131 · Updated May 2026</div>
+    <div class="sb-ver">v2.1.178+ · Updated Jul 2026</div>
   </div>
 
   <div class="sb-group">Start</div>
@@ -936,6 +938,7 @@ kbd {
   <a class="nav-item" onclick="nav('hooks')"><span class="ni">08</span>Hooks</a>
   <a class="nav-item" onclick="nav('mcp')"><span class="ni">09</span>MCP Servers</a>
   <a class="nav-item" onclick="nav('subagents')"><span class="ni">10</span>Subagents</a>
+  <a class="nav-item" onclick="nav('orchestration')"><span class="ni">10b</span>Workflows &amp; Teams <span style="color:var(--g);font-size:0.5rem;margin-left:2px;">NEW</span></a>
   <a class="nav-item" onclick="nav('skills')"><span class="ni">11</span>Skills &amp; Commands</a>
   <a class="nav-item" onclick="nav('models')"><span class="ni">12</span>Model Strategy</a>
 
@@ -956,8 +959,10 @@ kbd {
     <div class="hero-prompt">claude-code / obsessive-reference</div>
     <div class="hero-title">KNOW IT<br><span class="accent">COLD.</span></div>
     <p class="hero-sub">Every system, every flag, every pattern. The reference built for engineers who want to use Claude Code the way Anthropic's own team does — not casually, but as infrastructure.</p>
-    <div class="hero-rule">v2.1.131 · 18 sections · updated may 2026</div>
+    <div class="hero-rule">v2.1.178+ · 19 sections · updated jul 2026</div>
   </div>
+
+  <div class="tip"><strong>Just added:</strong> Dynamic Workflows (JS-orchestrated agent fleets up to 1,000 subagents), Agent Teams (peer-coordinating instances), <code>/goal</code> (autonomous multi-hour objectives), <code>/loop</code> (scheduled recurring runs), and the Managed Agents trio — Dreaming, Outcomes, and multiagent orchestration. See section 10b.</div>
 
   <h3>The 5 Systems That Determine Your Effectiveness</h3>
   <div class="grid2">
@@ -979,7 +984,7 @@ kbd {
     <div class="card">
       <div class="card-tag tag-g">System 04</div>
       <div class="card-title">MCP Protocol</div>
-      <div class="card-body">Connect 3,000+ external services. GitHub, databases, Sentry, Slack, your internal APIs. MCP turns Claude Code from a file editor into a full environment hub.</div>
+      <div class="card-body">Connect databases, GitHub, Sentry, Slack, your internal APIs — thousands of public servers exist, but keep only 5–7 connected at once or tool-selection accuracy degrades. Turns Claude Code from a file editor into a full environment hub.</div>
     </div>
     <div class="card">
       <div class="card-tag tag-g">System 05</div>
@@ -1108,7 +1113,7 @@ npm install -g @anthropic-ai/claude-code</div>
       <div>
         <div><span class="layer-tag tag-a">Core Layer</span></div>
         <div class="layer-name">Main Conversation Context</div>
-        <div class="layer-detail">Your primary interaction. Every message, file read, and tool output consumes from a shared 200K token window (1M with Opus extended). When context fills, quality degrades. This layer costs money per token. Use it for orchestration and final decisions only.</div>
+        <div class="layer-detail">Your primary interaction. Every message, file read, and tool output consumes from a context window — 1M tokens by default on current models (Fable 5, Sonnet 5, Opus 4.8/4.7), 200K on legacy models unless upgraded. When context fills, quality degrades. This layer costs money per token. Use it for orchestration and final decisions only.</div>
       </div>
     </div>
   </div>
@@ -1254,7 +1259,7 @@ MCP-connected marketing APIs. Observability: ADOT/OTEL + EMF + X-Ray.
     <div class="cb-label"><span>.claude/settings.json</span><div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
     <div class="cb">{
   <span class="st">"$schema"</span>: <span class="st">"https://json.schemastore.org/claude-code-settings.json"</span>,
-  <span class="st">"model"</span>: <span class="st">"claude-sonnet-4-6"</span>,
+  <span class="st">"model"</span>: <span class="st">"claude-sonnet-5"</span>,
   <span class="st">"permissions"</span>: {
     <span class="st">"allow"</span>: [<span class="st">"Read"</span>, <span class="st">"Glob"</span>, <span class="st">"Grep"</span>, <span class="st">"Bash(npm run:*)"</span>, <span class="st">"Edit(src/**)"</span>],
     <span class="st">"deny"</span>:  [<span class="st">"Read(.env*)"</span>, <span class="st">"Bash(rm -rf:*)"</span>, <span class="st">"Bash(sudo:*)"</span>],
@@ -1487,42 +1492,71 @@ MCP-connected marketing APIs. Observability: ADOT/OTEL + EMF + X-Ray.
     <div class="sec-num">09</div>
     <div class="sec-info">
       <div class="sec-title">MCP <span class="g">SERVERS</span></div>
-      <div class="sec-sub">3,000+ integrations. Extend Claude beyond files and bash.</div>
+      <div class="sec-sub">Thousands of public servers exist. Connect 5–7 well, not all of them.</div>
     </div>
   </div>
 
   <p>MCP (Model Context Protocol) turns Claude Code from a file-editing tool into a genuine environment hub. Connect GitHub, databases, Sentry, Slack, your internal APIs — Claude calls them as native tools.</p>
 
-  <h3>Configuring MCP Servers</h3>
+  <div class="warn"><strong>Correction:</strong> Public server counts vary wildly by source (estimates range from ~500 to 9,000+ depending on the registry) and the number itself isn't the useful fact. What matters: past roughly 40–50 visible tools, tool-selection accuracy degrades — the model has more options to weigh and picks wrong more often. The practical ceiling most teams land on is <strong>5–7 connected servers</strong>. Disconnect anything used less than weekly.</div>
+
+  <h3>Adding a Server (CLI, preferred) or JSON</h3>
   <div class="cb-wrap">
-    <div class="cb-label"><span>.mcp.json (project root) or ~/.claude/settings.json</span><div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    <div class="cb-label"><span>claude mcp add — scopes matter</span><div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    <div class="cb"><span class="cm"># --scope user: available globally, across all your projects</span>
+<span class="op">claude</span> mcp add --scope user github \
+  -- npx -y @modelcontextprotocol/server-github
+
+<span class="cm"># --scope local (default): per-user, per-project — good for a</span>
+<span class="cm"># project-specific DB or Sentry instance you don't want everywhere</span>
+<span class="op">claude</span> mcp add --scope local postgres \
+  -- npx -y @modelcontextprotocol/server-postgres postgresql://localhost/mydb
+
+<span class="cm"># --scope project: writes to .mcp.json in repo root, shared via git</span>
+<span class="op">claude</span> mcp add --scope project github \
+  --transport http https://api.githubcopilot.com/mcp/ \
+  -e GITHUB_TOKEN=ghp_your_token
+
+<span class="cm"># List / inspect / remove</span>
+<span class="op">claude</span> mcp list
+<span class="op">claude</span> mcp get github
+<span class="op">claude</span> mcp remove github
+
+<span class="cm"># Authenticate a server without opening the interactive /mcp menu</span>
+<span class="op">claude</span> mcp login github
+<span class="op">claude</span> mcp logout github</div>
+  </div>
+
+  <h3>Or Configure Directly in .mcp.json</h3>
+  <div class="cb-wrap">
+    <div class="cb-label"><span>.mcp.json (project root, committed via --scope project)</span><div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
     <div class="cb">{
   <span class="st">"mcpServers"</span>: {
     <span class="st">"github"</span>: {
-      <span class="st">"command"</span>: <span class="st">"npx"</span>,
-      <span class="st">"args"</span>: [<span class="st">"-y"</span>, <span class="st">"@modelcontextprotocol/server-github"</span>],
-      <span class="st">"env"</span>: { <span class="st">"GITHUB_PERSONAL_ACCESS_TOKEN"</span>: <span class="st">"ghp_..."</span> }
+      <span class="st">"type"</span>: <span class="st">"http"</span>,
+      <span class="st">"url"</span>: <span class="st">"https://api.githubcopilot.com/mcp/"</span>,
+      <span class="st">"env"</span>: { <span class="st">"GITHUB_TOKEN"</span>: <span class="st">"ghp_..."</span> }
     },
     <span class="st">"postgres"</span>: {
       <span class="st">"command"</span>: <span class="st">"npx"</span>,
       <span class="st">"args"</span>: [<span class="st">"-y"</span>, <span class="st">"@modelcontextprotocol/server-postgres"</span>,
                <span class="st">"postgresql://localhost/mydb"</span>]
-    },
-    <span class="st">"your-internal-api"</span>: {
-      <span class="st">"command"</span>: <span class="st">"python3"</span>,
-      <span class="st">"args"</span>: [<span class="st">"/path/to/your/mcp-server.py"</span>],
-      <span class="st">"env"</span>: { <span class="st">"API_KEY"</span>: <span class="st">"..."</span> }
     }
   }
 }</div>
   </div>
 
+  <div class="warn"><strong>Config gotcha:</strong> A JSON entry with a <code>url</code> but no <code>type</code> field is now a hard error (Claude Code otherwise assumes stdio and skips the server). Always set <code>"type": "http"</code> explicitly. SSE transport is deprecated — use HTTP servers where the vendor offers them.</div>
+
+  <h3>Tool Search — lazy loading (reduces context ~95%)</h3>
+  <p>Claude Code doesn't load every tool schema from every connected server upfront anymore. Tool Search discovers tools on demand and only pulls in the schema it actually needs — this is what makes running 5-7 servers practical without drowning the context window in unused tool definitions.</p>
+
   <h3>High-Value MCP Servers for Your Stack</h3>
   <div class="grid2">
     <div class="card">
-      <div class="card-tag tag-g">@modelcontextprotocol/server-github</div>
-      <div class="card-title">GitHub</div>
-      <div class="card-body">Create PRs, comment on issues, review code, list open tickets — all from the CLI without switching context.</div>
+      <div class="card-tag tag-g">GitHub (official)</div>
+      <div class="card-title">github MCP</div>
+      <div class="card-body">Create PRs, comment on issues, review code, search across repos — all from the CLI. Use the official HTTP endpoint over the community stdio server where possible.</div>
     </div>
     <div class="card">
       <div class="card-tag tag-b">AWS MCP servers</div>
@@ -1530,18 +1564,18 @@ MCP-connected marketing APIs. Observability: ADOT/OTEL + EMF + X-Ray.
       <div class="card-body">Query CloudWatch logs, describe Lambda functions, check CloudFormation stacks. Your debugger agent's best friend.</div>
     </div>
     <div class="card">
-      <div class="card-tag tag-a">Sentry / Datadog MCPs</div>
+      <div class="card-tag tag-a">Sentry MCP</div>
       <div class="card-title">Observability</div>
       <div class="card-body">Fetch recent errors, traces, and alerts. Claude can correlate your code changes with production errors automatically.</div>
     </div>
     <div class="card">
-      <div class="card-tag tag-r">@modelcontextprotocol/server-postgres</div>
+      <div class="card-tag tag-r">postgres / supabase MCP</div>
       <div class="card-title">Database</div>
-      <div class="card-body">Query your DB directly. Schema introspection, data debugging, migration verification — without writing a single SQL client.</div>
+      <div class="card-body">Query your DB directly. Schema introspection, data debugging, migration verification. Use read-only mode against production.</div>
     </div>
   </div>
 
-  <div class="tip"><strong>Disable unused servers:</strong> Every connected MCP server adds startup time and potential tool noise. Only enable the servers relevant to the current project via project-level <code>.mcp.json</code>.</div>
+  <div class="tip"><strong>Keep secrets out of committed files:</strong> <code>.mcp.json</code> is committed to the repo when added with <code>--scope project</code>. Reference environment variables in the <code>env</code> block rather than inlining tokens directly. Restart Claude Code after adding a server — config is read at startup only.</div>
 </div>
 
 <!-- ══ 10 SUBAGENTS ══ -->
@@ -1614,6 +1648,230 @@ Report findings with severity: CRITICAL / HIGH / MEDIUM / LOW</div>
   </div>
 </div>
 
+<!-- ══ 10b DYNAMIC WORKFLOWS & AGENT TEAMS ══ -->
+<div id="s-orchestration" class="section">
+  <div class="sec-head">
+    <div class="sec-num">10b</div>
+    <div class="sec-info">
+      <div class="sec-title">WORKFLOWS <span class="g">&amp; TEAMS</span></div>
+      <div class="sec-sub">Dynamic Workflows · Agent Teams · /goal · /loop — shipped May–June 2026</div>
+    </div>
+  </div>
+
+  <div class="warn"><strong>Where this fits:</strong> Subagents (section 10) are Claude-orchestrated turn-by-turn — Claude decides what to spawn next, and every result lands back in its context. The features on this page move the plan itself out of the conversation: into a script, a scheduled loop, or a team of peers. Reach for these when subagents alone start to buckle under scale or coordination complexity.</div>
+
+  <h3>Dynamic Workflows — code-orchestrated agent fleets</h3>
+  <p>Announced June 2, 2026. Claude writes a JavaScript orchestration script on demand, custom-built for your task, and a runtime executes it in the background while your session stays responsive. The script — not the conversation — holds the loop, the branching logic, and the intermediate results. Requires <strong>Claude Code v2.1.154+</strong>.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-tag tag-g">Why it exists</div>
+      <div class="card-title">Context isolation at scale</div>
+      <div class="card-body">Old approach (subagents/teams): every result flows back through the conversation, filling the window fast. A workflow calls subagents and collects results into script variables — only the final synthesis reaches your context.</div>
+    </div>
+    <div class="card">
+      <div class="card-tag tag-g">Scale</div>
+      <div class="card-title">Up to 1,000 subagents</div>
+      <div class="card-body">16 run concurrently at any moment. Bun's team reportedly used this to port ~750K lines from Zig to Rust in 11 days with a two-reviewer-per-file adversarial model, hitting 99.8% test compatibility.</div>
+    </div>
+    <div class="card">
+      <div class="card-tag tag-a">Determinism</div>
+      <div class="card-title">Code owns the order</div>
+      <div class="card-body">Runs the same way every time instead of depending on whether the model "feels" done. Workflows journal every agent() call so a run can resume — this is why non-deterministic calls like Date.now() are disallowed inside scripts.</div>
+    </div>
+    <div class="card">
+      <div class="card-tag tag-b">Zero coordination tax</div>
+      <div class="card-title">Free routing</div>
+      <div class="card-body">The coordination layer isn't another model conversation — it's plain JS — so routing the fleet costs zero extra model tokens beyond the agents themselves.</div>
+    </div>
+  </div>
+
+  <h3>Triggering a Workflow</h3>
+  <div class="cb-wrap">
+    <div class="cb-label"><span>three ways to start one</span><div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    <div class="cb"><span class="cm"># 1. Include the word "workflow" in your prompt</span>
+Run a workflow to audit every API endpoint under src/routes
+for missing auth checks.
+
+<span class="cm"># 2. Just ask in plain English — Claude offers to use one</span>
+Migrate the auth module from Express 4 to Express 5 using a
+workflow. Verify all tests pass at each stage.
+
+<span class="cm"># 3. Force high-effort auto orchestration for the whole session</span>
+/effort ultracode
+
+<span class="cm"># Dismiss a suggested workflow for one prompt (doesn't disable the feature)</span>
+<span class="cm">macOS:            Option+W</span>
+<span class="cm">Windows/Linux:    Alt+W</span>
+
+<span class="cm"># Run the built-in research workflow</span>
+/deep-research What changed in the Node.js permission model
+between v20 and v22?
+
+<span class="cm"># Inspect running/past workflows</span>
+/workflows</div>
+  </div>
+
+  <h3>The Six Coordination Patterns</h3>
+  <table class="tbl">
+    <thead><tr><th>Pattern</th><th>Shape</th><th>Use it for</th></tr></thead>
+    <tbody>
+      <tr><td class="tc">Classify &amp; act</td><td>One agent decides task type, script routes accordingly</td><td>Triaging inbound bugs vs features vs noise, support ticket routing</td></tr>
+      <tr><td class="tc">Fan out &amp; synthesize</td><td>Many small agents, one clean-context each, results merged at a barrier</td><td>Large step counts, or steps that shouldn't cross-contaminate context</td></tr>
+      <tr><td class="tc">Adversarial verification</td><td>A second agent reviews the first agent's output against a rubric</td><td>Countering self-preferential bias — the agent that produced output shouldn't grade it</td></tr>
+      <tr><td class="tc">Generate &amp; filter</td><td>Generate N ideas, filter/dedupe by rubric, keep only the best</td><td>Brainstorming, candidate solution generation, idea ranking</td></tr>
+      <tr><td class="tc">Tournament</td><td>N agents attempt the same task differently; judge agent picks winner pairwise</td><td>High-stakes plans worth drafting from several independent angles</td></tr>
+      <tr><td class="tc">Loop until done</td><td>Repeats a stage until a condition or budget is met</td><td>Iterative refinement, verification passes, monitoring</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Workflow Script Anatomy</h3>
+  <div class="cb-wrap">
+    <div class="cb-label"><span>.claude/workflows/example.js (structure)</span><div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    <div class="cb"><span class="kw">export</span> <span class="kw">const</span> meta = {
+  <span class="va">name</span>: <span class="st">'security-audit'</span>,
+  <span class="va">description</span>: <span class="st">'Audit every route for missing auth checks'</span>,
+  <span class="va">whenToUse</span>: <span class="st">'Run when auditing endpoint security across the repo'</span>,
+  <span class="va">phases</span>: [
+    { <span class="va">title</span>: <span class="st">'Discover'</span>, <span class="va">detail</span>: <span class="st">'one agent enumerates all route files'</span> },
+    { <span class="va">title</span>: <span class="st">'Audit'</span>,    <span class="va">detail</span>: <span class="st">'fan out — one agent per route file'</span> },
+    { <span class="va">title</span>: <span class="st">'Verify'</span>,   <span class="va">detail</span>: <span class="st">'adversarial pass on flagged routes'</span> },
+    { <span class="va">title</span>: <span class="st">'Report'</span>,   <span class="va">detail</span>: <span class="st">'synthesize findings into one report'</span> },
+  ],
+}
+
+<span class="cm">// budget exposes the token target; null if launched without one</span>
+<span class="cm">// pipeline() by default; parallel() only when a stage needs ALL prior results at once</span>
+<span class="cm">// Date.now(), Math.random(), argless `new Date()` all throw — pass timestamps via args</span></div>
+  </div>
+
+  <div class="kill"><strong>Cost warning:</strong> A workflow spawns many agents, so a single run can use meaningfully more tokens than the same task in conversation. When a run schedules more than 25 agents or its projected token total passes 1.5M, the task panel shows a <strong>Large workflow warning</strong>. Test on a small slice first — one directory instead of the whole repo — before committing to a full run. You can cap spend by prompting a budget directly: <code>"use 10k tokens"</code>.</div>
+
+  <div class="tip"><strong>When it's overkill:</strong> Skip workflows for anything under ~10 minutes of work, specs that aren't finalized yet, subjective judgment calls with no clear right answer, or low-stakes tasks where failure costs nothing. Vague prompts like "improve the app" cause subagents to fail to converge and waste tokens — define scope, output format, validation rules, and editing policy explicitly.</div>
+
+  <h3>Agent Teams — peers, not subordinates</h3>
+  <p>The key difference from subagents: <strong>subagents report up to the main session and can't talk to each other. Teammates in Agent Teams communicate directly, share a task list, and challenge each other's findings.</strong> Still experimental — disabled by default.</p>
+
+  <div class="cb-wrap">
+    <div class="cb-label"><span>enable agent teams</span><div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    <div class="cb"><span class="cm"># settings.json</span>
+<span class="st">"env"</span>: { <span class="st">"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"</span>: <span class="st">"1"</span> }
+
+<span class="cm"># or shell env var</span>
+<span class="kw">export</span> <span class="va">CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS</span>=1
+
+<span class="cm"># Then describe the task and teammates in plain English:</span>
+I'm designing a rate limiter for our API gateway. Spawn three
+teammates to explore this from different angles: one on UX
+implications, one on technical architecture, one playing devil's
+advocate on failure modes.
+
+<span class="cm"># Claude populates a shared task list, spawns teammates, and</span>
+<span class="cm"># synthesizes findings when they finish. Interact with any</span>
+<span class="cm"># teammate directly from the agent panel below the prompt.</span></div>
+  </div>
+
+  <table class="tbl">
+    <thead><tr><th>Choose</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td class="tc">Subagents</td><td>Quick, focused workers that report back to you. Sequential tasks, same-file edits, work with many dependencies.</td></tr>
+      <tr><td class="tc">Agent Teams</td><td>Teammates need to share findings, challenge each other, and self-coordinate. Research/review or cross-layer work (frontend + backend + tests owned separately).</td></tr>
+      <tr><td class="tc">Dynamic Workflows</td><td>The task needs more agents than one conversation can coordinate, or you want the orchestration codified as a rerunnable script.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn"><strong>Cost note:</strong> Agent Teams add coordination overhead and use significantly more tokens than a single session. They work best when teammates can genuinely operate independently — if they constantly need to read each other's output or touch shared files, the coordination messages eat into the very context you were trying to save.</div>
+
+  <h3>/goal — autonomous multi-hour objectives</h3>
+  <p>Shipped May 12, 2026 alongside Agent View and <code>claude --bg</code>. <code>/goal</code> hands Claude a high-level objective and lets it work toward it autonomously — often for hours — without approving every action. It checks in at decision points rather than barreling through wrong assumptions; total silence through a multi-hour task is a red flag, not the intended behavior.</p>
+
+  <div class="cb-wrap">
+    <div class="cb-label"><span>writing a good /goal prompt</span><div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    <div class="cb"><span class="cm"># Bad — no measurable endpoint, over-specifies nothing, under-specifies scope</span>
+/goal Improve performance
+
+<span class="cm"># Good — specific outcome, scoped module, testable success condition, explicit constraint</span>
+/goal Reduce p95 response time on the /api/search endpoint by
+optimizing the database query in SearchService. Success: p95
+under 200ms on the existing load test. Do not touch the auth
+middleware or change the public API contract.</div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-tag tag-g">Good fit</div>
+      <div class="card-title">Clear success criteria</div>
+      <div class="card-body">"All tests pass" or "the migration is complete" — testable outcomes Claude can verify itself against.</div>
+    </div>
+    <div class="card">
+      <div class="card-tag tag-g">Good fit</div>
+      <div class="card-title">Multi-step, sequential work</div>
+      <div class="card-body">Step 4 depends on step 3's output. You don't want to manage that sequencing turn by turn yourself.</div>
+    </div>
+    <div class="card">
+      <div class="card-tag tag-r">Poor fit</div>
+      <div class="card-title">Unbounded scope</div>
+      <div class="card-body">"Improve the app" has no stopping condition. Autonomous agents will touch whatever seems relevant unless explicitly constrained.</div>
+    </div>
+    <div class="card">
+      <div class="card-tag tag-r">Poor fit</div>
+      <div class="card-title">Unfamiliar or critical-path code</div>
+      <div class="card-body">Hours of unsupervised access is lower-risk on a well-understood module than on something unfamiliar or load-bearing. Commit your working state first.</div>
+    </div>
+  </div>
+
+  <h3>/loop — scheduled recurring runs</h3>
+  <p><code>/goal</code> defines when work is <em>done</em>. <code>/loop</code> defines when it should <em>run again</em>. They're complementary, not competing: a workflow can coordinate dozens of agents, a <code>/goal</code> can require agreement across sources before completion, and a <code>/loop</code> can re-trigger the whole thing on a schedule.</p>
+
+  <div class="cb-wrap">
+    <div class="cb-label"><span>loop patterns</span><div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    <div class="cb"><span class="cm"># In-session polling on an interval</span>
+/loop 5m /health-check
+
+<span class="cm"># Pair a repeatable workflow with a goal and a schedule</span>
+/loop 1h /deep-research check for new CVEs affecting our
+dependencies, /goal no unpatched critical CVEs older than 24h</div>
+  </div>
+
+  <h3>Managed Agents (Platform-level, not local CLI)</h3>
+  <p>These live on the Claude Platform / API, not as local CLI files — but they're the natural next step once your team outgrows local CLAUDE.md + hooks for a production agent. Shipped May 6, 2026.</p>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="card-tag tag-g">Research preview</div>
+      <div class="card-title">Dreaming</div>
+      <div class="card-body">Scheduled process (runs between sessions, not during) that reviews past sessions and memory stores, merges duplicates, resolves contradictions, and surfaces patterns a single agent can't see — recurring mistakes, team-shared preferences. Input store is never modified; review the output before adopting it.</div>
+    </div>
+    <div class="card">
+      <div class="card-tag tag-a">Public beta</div>
+      <div class="card-title">Outcomes</div>
+      <div class="card-body">Write a rubric describing what "good" looks like. A separate grader — in its own context window, not influenced by the agent's reasoning — evaluates output against it and the agent takes another pass if it falls short. Anthropic reports ~10% quality improvement from the grading loop alone, no model change.</div>
+    </div>
+    <div class="card">
+      <div class="card-tag tag-b">Public beta</div>
+      <div class="card-title">Multiagent orchestration</div>
+      <div class="card-body">Cloud-side lead+specialist delegation on a shared file system. A lead agent breaks a job into pieces, delegates to specialists with their own model/prompts/tools, and can check in mid-workflow. Fully auditable in Claude Console — see what each sub-agent did and why.</div>
+    </div>
+  </div>
+
+  <div class="tip"><strong>Real deployments:</strong> Harvey saw ~6x higher completion rates using Dreaming for legal drafting. Wisedocs cut document review time 50% using Outcomes-graded review. Netflix's platform team uses multiagent orchestration to analyze logs across hundreds of builds in parallel and surface only cross-cutting patterns.</div>
+
+  <h3>Quick Disambiguation</h3>
+  <table class="tbl">
+    <thead><tr><th>I want to...</th><th>Reach for</th></tr></thead>
+    <tbody>
+      <tr><td class="tc">A quick focused worker that reports back to me</td><td>Subagent</td></tr>
+      <tr><td class="tc">Two or three Claudes to debate and hand off work as peers</td><td>Agent Teams</td></tr>
+      <tr><td class="tc">A big job (100s of files, 1000s of agents) with the plan in code, not conversation</td><td>Dynamic Workflow</td></tr>
+      <tr><td class="tc">Hand off an objective and walk away for hours</td><td>/goal</td></tr>
+      <tr><td class="tc">Re-run something on a schedule or until a condition holds</td><td>/loop</td></tr>
+      <tr><td class="tc">Claude to remember what it learned between sessions on a deployed agent</td><td>Dreaming (Managed Agents)</td></tr>
+      <tr><td class="tc">Claude to self-grade against a rubric and retry until it passes</td><td>Outcomes (Managed Agents)</td></tr>
+      <tr><td class="tc">Claude baked into my SaaS/back-office as a cloud service</td><td>Managed Agents (multiagent orchestration)</td></tr>
+    </tbody>
+  </table>
+</div>
+
 <!-- ══ 11 SKILLS ══ -->
 <div id="s-skills" class="section">
   <div class="sec-head">
@@ -1625,6 +1883,8 @@ Report findings with severity: CRITICAL / HIGH / MEDIUM / LOW</div>
   </div>
 
   <p>Skills are folders with a <code>SKILL.md</code> file in <code>.claude/skills/</code> (project) or <code>~/.claude/skills/</code> (personal). Each skill becomes a <code>/skill-name</code> slash command automatically. They load just-in-time, keeping CLAUDE.md lean.</p>
+
+  <div class="tip"><strong>Naming note:</strong> Custom slash commands (the old <code>.claude/commands/*.md</code> files) were merged into Skills as of v2.1.101. Existing <code>.claude/commands/</code> files still work unchanged, but new work should go in <code>.claude/skills/&lt;name&gt;/SKILL.md</code>. If a skill and a command share the same name, the skill wins.</div>
 
   <h3>Skill Frontmatter Options</h3>
   <div class="cb-wrap">
@@ -1682,9 +1942,11 @@ Steps:
     <div class="sec-num">12</div>
     <div class="sec-info">
       <div class="sec-title">MODEL <span class="g">STRATEGY</span></div>
-      <div class="sec-sub">Route work to the right tier. Quality × cost × speed tradeoffs.</div>
+      <div class="sec-sub">Route work to the right tier. Quality × cost × speed tradeoffs. Updated for the July 2026 lineup.</div>
     </div>
   </div>
+
+  <div class="kill"><strong>Superseded since our last pass:</strong> Sonnet 4.6 and Opus 4.6 are now legacy. <strong>Claude Sonnet 5</strong> became Claude Code's default model in v2.1.197 (June 30, 2026) with native 1M context. <strong>Opus 4.8</strong> sits above it for the hardest agentic work. A new top tier, <strong>Claude Fable 5</strong>, launched June 9, 2026 above Opus. If your install still shows 4.6-series models as current, update Claude Code.</div>
 
   <div class="tier-row">
     <div class="tier-card">
@@ -1699,25 +1961,36 @@ Steps:
       </ul>
     </div>
     <div class="tier-card best">
-      <div class="tier-name" style="color:var(--g)">Sonnet</div>
-      <div class="tier-label">claude-sonnet-4-6 · Balanced · Default</div>
+      <div class="tier-name" style="color:var(--g)">Sonnet 5</div>
+      <div class="tier-label">claude-sonnet-5 · Default since v2.1.197</div>
       <ul class="tier-use">
         <li>Most implementation work</li>
         <li>Code review subagents</li>
         <li>Feature development</li>
-        <li>Documentation writing</li>
-        <li>Debugging (non-critical)</li>
+        <li>Native 1M context, no premium</li>
+        <li>Best speed/intelligence balance</li>
       </ul>
     </div>
     <div class="tier-card">
-      <div class="tier-name" style="color:var(--amber)">Opus</div>
-      <div class="tier-label">claude-opus-4-6/4-7 · Powerful · Expensive</div>
+      <div class="tier-name" style="color:var(--amber)">Opus 4.8</div>
+      <div class="tier-label">claude-opus-4-8 · Complex agentic work</div>
       <ul class="tier-use">
         <li>Architecture decisions</li>
         <li>Complex multi-file refactors</li>
         <li>Security reviews (critical)</li>
-        <li>Debugging subtle/systemic bugs</li>
-        <li>Extended thinking tasks</li>
+        <li>Long-horizon agentic coding</li>
+        <li>Better tool-triggering than 4.7</li>
+      </ul>
+    </div>
+    <div class="tier-card">
+      <div class="tier-name" style="color:#c792ea">Fable 5</div>
+      <div class="tier-label">claude-fable-5 · Absolute ceiling</div>
+      <ul class="tier-use">
+        <li>Hardest possible tasks only</li>
+        <li>Always-on adaptive thinking</li>
+        <li>Falls back to Opus 4.8 on flagged cyber/bio requests</li>
+        <li>Select deliberately: /model fable</li>
+        <li>Highest cost tier — use sparingly</li>
       </ul>
     </div>
   </div>
@@ -1726,22 +1999,32 @@ Steps:
   <div class="cb-wrap">
     <div class="cb-label"><span>model control</span><div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
     <div class="cb"><span class="cm"># In session</span>
-/model claude-opus-4-6
+/model sonnet         <span class="cm"># claude-sonnet-5, current default</span>
+/model opus            <span class="cm"># claude-opus-4-8</span>
+/model fable           <span class="cm"># claude-fable-5, deliberate ceiling pick</span>
 /model claude-haiku-4-5
 
 <span class="cm"># CLI flag for full session</span>
-<span class="op">claude</span> --model claude-opus-4-6
+<span class="op">claude</span> --model claude-opus-4-8
 
 <span class="cm"># Subagent model env var</span>
 <span class="kw">export</span> <span class="va">CLAUDE_CODE_SUBAGENT_MODEL</span>=haiku
 
-<span class="cm"># Set effort level (reduces tokens used for reasoning)</span>
-/effort low       <span class="cm"># simple tasks</span>
-/effort medium    <span class="cm"># default</span>
-/effort high      <span class="cm"># complex architecture</span></div>
+<span class="cm"># Effort levels (five now, not three)</span>
+/effort low
+/effort medium
+/effort high        <span class="cm"># default on Sonnet 5, Opus 4.8, Fable 5</span>
+/effort xhigh       <span class="cm"># deepest reasoning below max; Opus 4.7 defaults here</span>
+/effort ultracode    <span class="cm"># xhigh + Claude auto-orchestrates dynamic workflows — see section 10b</span>
+/effort auto         <span class="cm"># reset to the model's default</span>
+
+<span class="cm"># One-off deep reasoning without changing session effort:</span>
+<span class="cm"># put the word "ultrathink" anywhere in your prompt for that turn only.</span>
+<span class="cm"># "think" / "think hard" / "think harder" are NOT special keywords anymore —</span>
+<span class="cm"># they're passed through as plain text. ultrathink is the one that works.</span></div>
   </div>
 
-  <div class="tip"><strong>Default as of April 2026:</strong> Pro and Max subscribers default to <strong>high effort</strong> on Opus 4.6 and Sonnet 4.6. Opus 4.7 stays at xhigh. This was restored after a March/April effort downgrade. Standardize on Opus if quality is your only variable — cost difference is worth it at your usage level.</div>
+  <div class="tip"><strong>Current defaults (July 2026):</strong> Effort defaults to <strong>high</strong> on Fable 5, Sonnet 5, Opus 4.8, and Sonnet 4.6/Opus 4.6 (legacy) — and <strong>xhigh</strong> on Opus 4.7. All current models get a native <strong>1M token context window</strong> by default on the API; on Max/Team/Enterprise, Opus is auto-upgraded to 1M with no config needed. Set <code>CLAUDE_CODE_DISABLE_1M_CONTEXT=1</code> if you need to cap a deployment at 200K.</div>
 </div>
 
 <!-- ══ 13 MEMORY ══ -->
@@ -1791,8 +2074,8 @@ See @.claude/rules/testing.md for testing standards</div>
     </div>
     <div class="card">
       <div class="card-tag tag-r">Context window</div>
-      <div class="card-title">200K / 1M tokens</div>
-      <div class="card-body">Standard models: 200K. Opus 4.6 / extended context: 1M. Monitor with <code>/cost</code>. Use subagents to offload exploration and prevent bloat.</div>
+      <div class="card-title">1M tokens (default)</div>
+      <div class="card-body">Fable 5, Sonnet 5, Opus 4.8, Opus 4.7 run 1M by default on the API. On Max/Team/Enterprise, Opus auto-upgrades to 1M with no config. Sonnet 4.6's 1M variant still needs usage credits. Cap with <code>CLAUDE_CODE_DISABLE_1M_CONTEXT=1</code>. Monitor with <code>/cost</code>.</div>
     </div>
   </div>
 </div>
@@ -1908,24 +2191,30 @@ and link it to ticket MKTG-247.
     </div>
   </div>
 
-  <h3>Typical Session Cost</h3>
+  <h3>Typical Session Cost (rough, usage varies widely)</h3>
   <div class="cost-bar">
     <div class="cb-row">
-      <div class="cb-label2">Haiku</div>
+      <div class="cb-label2">Haiku 4.5</div>
       <div class="cb-track"><div class="cb-fill" style="width:8%;background:var(--g)"></div></div>
-      <div class="cb-val">$0.10–0.45</div>
+      <div class="cb-val">$1/$5 per MTok</div>
     </div>
     <div class="cb-row">
-      <div class="cb-label2">Sonnet</div>
+      <div class="cb-label2">Sonnet 5</div>
       <div class="cb-track"><div class="cb-fill" style="width:35%;background:var(--amber)"></div></div>
-      <div class="cb-val">$0.20–1.50</div>
+      <div class="cb-val">$2/$10 → $3/$15*</div>
     </div>
     <div class="cb-row">
-      <div class="cb-label2">Opus</div>
-      <div class="cb-track"><div class="cb-fill" style="width:75%;background:var(--red)"></div></div>
-      <div class="cb-val">$0.50–2.25</div>
+      <div class="cb-label2">Opus 4.8</div>
+      <div class="cb-track"><div class="cb-fill" style="width:65%;background:var(--red)"></div></div>
+      <div class="cb-val">$5/$25 per MTok</div>
+    </div>
+    <div class="cb-row">
+      <div class="cb-label2">Fable 5</div>
+      <div class="cb-track"><div class="cb-fill" style="width:100%;background:#c792ea"></div></div>
+      <div class="cb-val">$10/$50 per MTok</div>
     </div>
   </div>
+  <p style="font-size:0.72rem;color:var(--muted);margin-top:-14px;">*Sonnet 5 launch pricing ($2/$10 input/output per MTok) holds through Aug 31, 2026, then reverts to $3/$15. All rates: input/output per million tokens, before prompt-caching discounts (up to 90% off) or batch processing (50% off).</p>
 
   <h3>Cost Reduction Tactics</h3>
   <div class="cb-wrap">
@@ -2062,7 +2351,7 @@ Error logs must include: correlation_id, trace_id, input summary
 
 <script>
   const SECTIONS = ['home','install','mental','claudemd','config','perms','slash','keys',
-                    'hooks','mcp','subagents','skills','models','memory','git','headless','cost','nick'];
+                    'hooks','mcp','subagents','orchestration','skills','models','memory','git','headless','cost','nick'];
 
   const allNavItems = document.querySelectorAll('.nav-item');
   const allSections = document.querySelectorAll('.section');
